@@ -34,6 +34,14 @@ namespace Bithumb.API
             __secret_key = secret_key;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="endpoint"></param>
+        /// <param name="rgData"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="apiSecret"></param>
+        /// <returns></returns>
         protected Dictionary<string, object> GetHttpHeaders(string endpoint, Dictionary<string, object> rgData, string apiKey, string apiSecret)
         { // 컨텐츠에 대한 보안 정보 생성하여 Header 설정
             // 결국 _secretKey 를 기반으로 HTTP 헤더에 _signature 를 추가하기 위한 작업이 핵심

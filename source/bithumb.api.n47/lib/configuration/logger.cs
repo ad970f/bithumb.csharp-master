@@ -15,9 +15,9 @@ namespace Bithumb.LIB.Configuration
         private static CConfig __cconfig = new CConfig();
 
         /// <summary>
-        /// 
+        /// 로그파일 이름의 Prefix 설정
         /// </summary>
-        public CLogger(string p_log_name = "BTC-TRADING")
+        public CLogger(string p_log_name = "BITHUMB")
         {
             this.LogFileName = p_log_name;
         }
@@ -76,7 +76,8 @@ namespace Bithumb.LIB.Configuration
         }
 
         /// <summary>
-        /// 
+        /// 로그파일 풀 패스
+        /// "C:\\ProgramData\\logging\\201709\\BITHUMB20170929.log"
         /// </summary>
         /// <param name="p_message_type"></param>
         /// <param name="p_message"></param>
@@ -88,8 +89,14 @@ namespace Bithumb.LIB.Configuration
             {
                 var _log_time = DateTime.Now;
 
+                // YYYYMM 폴더 생성
                 var _log_directory = __cconfig.GetLoggingFolder(String.Format("{0:yyyyMM}", _log_time));
+
+                //_log_file = "BTC-TRADING20170929.log"
                 var _log_file = String.Format("{0}{1:yyyyMMdd}.log", this.LogFileName, _log_time);
+
+                // _log_directory = "C:\\ProgramData\\logging\\201709"
+                // _log_path = "C:\\ProgramData\\logging\\201709\\BTC-TRADING20170929.log"
                 var _log_path = Path.Combine(_log_directory, _log_file);
 
                 _fs = new FileStream(_log_path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);

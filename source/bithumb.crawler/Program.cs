@@ -5,6 +5,7 @@ using Bithumb.API.Public;
 using Bithumb.LIB;
 using Bithumb.LIB.Types;
 using Bithumb.API.lib.database;
+using Bithumb.LIB.Configuration;
 
 namespace bithumb.crawler
 {
@@ -24,7 +25,10 @@ namespace bithumb.crawler
 
         }
 
-
+        /// <summary>
+        /// 타이머 이벤트 콜백
+        /// </summary>
+        /// <param name="state"></param>
         static void callback(Object state)
         {
             DateTime currentTime = DateTime.Now;
@@ -43,13 +47,15 @@ namespace bithumb.crawler
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ct"></param>
         static async void XPublicTicker(CoinType ct)
         {
-            string currency = ct.enumToString();
-
             var _public_api = new XPublicApi();
 
-            var _ticker = await _public_api.Ticker(currency);
+            var _ticker = await _public_api.Ticker(ct.enumToString());
 
             if (_ticker != null)
             { // null return  이 오는 경우가 있다.
