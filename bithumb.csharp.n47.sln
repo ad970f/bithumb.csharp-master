@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EFFFF510-E675-4A31-B7AD-2EA3A7E60DAA}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bithumb.crawler", "source\bithumb.crawler\bithumb.crawler.csproj", "{44A1A980-58C8-471A-BE7C-1C61673CE2CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bithumb.chart", "source\bithumb.chart\bithumb.chart.csproj", "{511A3C0C-3FB5-4521-B43E-AA9EF9C221F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "btc.trader", "source\btc.trader\btc.trader.csproj", "{0EFE29EA-3BB2-4594-8398-B0FD81D04191}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +23,6 @@ Global
 		{CBE9655B-659C-4B6F-BC62-889BD9212685}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBE9655B-659C-4B6F-BC62-889BD9212685}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBE9655B-659C-4B6F-BC62-889BD9212685}.Release|Any CPU.Build.0 = Release|Any CPU
-		{436CE132-5F05-4B76-8C7D-5FC9133F87F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{436CE132-5F05-4B76-8C7D-5FC9133F87F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{436CE132-5F05-4B76-8C7D-5FC9133F87F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{436CE132-5F05-4B76-8C7D-5FC9133F87F7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{44A1A980-58C8-471A-BE7C-1C61673CE2CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{44A1A980-58C8-471A-BE7C-1C61673CE2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44A1A980-58C8-471A-BE7C-1C61673CE2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,14 +31,21 @@ Global
 		{511A3C0C-3FB5-4521-B43E-AA9EF9C221F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{511A3C0C-3FB5-4521-B43E-AA9EF9C221F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{511A3C0C-3FB5-4521-B43E-AA9EF9C221F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EFE29EA-3BB2-4594-8398-B0FD81D04191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EFE29EA-3BB2-4594-8398-B0FD81D04191}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EFE29EA-3BB2-4594-8398-B0FD81D04191}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EFE29EA-3BB2-4594-8398-B0FD81D04191}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CBE9655B-659C-4B6F-BC62-889BD9212685} = {EFFFF510-E675-4A31-B7AD-2EA3A7E60DAA}
-		{436CE132-5F05-4B76-8C7D-5FC9133F87F7} = {EFFFF510-E675-4A31-B7AD-2EA3A7E60DAA}
 		{44A1A980-58C8-471A-BE7C-1C61673CE2CE} = {EFFFF510-E675-4A31-B7AD-2EA3A7E60DAA}
 		{511A3C0C-3FB5-4521-B43E-AA9EF9C221F8} = {EFFFF510-E675-4A31-B7AD-2EA3A7E60DAA}
+		{0EFE29EA-3BB2-4594-8398-B0FD81D04191} = {EFFFF510-E675-4A31-B7AD-2EA3A7E60DAA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8144D54A-B6FD-43FA-80D0-43B9DEF49CD7}
 	EndGlobalSection
 EndGlobal

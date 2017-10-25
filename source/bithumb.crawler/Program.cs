@@ -16,9 +16,10 @@ namespace bithumb.crawler
 
         static void Main(string[] args)
         {
-            Timer t = new Timer(callback, null, 0, 1000*1);
-
             Console.WriteLine("Bithumb Public Ticker Data Request Start. Press Any Key To Stop.\n\n\n");
+
+            Timer t = new Timer(callback, null, 0, 1000 * 2);
+
             Console.ReadLine();
 
             t.Dispose();
