@@ -10,35 +10,13 @@ using Bithumb.LIB.Types;
 
 namespace Bithumb.API.lib.database
 {
-    public delegate void PublicTickerEventHandler(object source, PublicTickerArgs e);
-
-    public class PublicTickerArgs : EventArgs
-    {
-        List<PublicTicker> __ptList;
-
-        public PublicTickerArgs(List<PublicTicker> ptList)
-        {
-            __ptList = ptList;
-        }
-
-
-        public List<PublicTicker> ptList
-        {
-            get
-            {
-                return __ptList;
-            }
-            
-        }
-    }
-
-    public class dbPack : IDisposable
+    public class dbConnector : IDisposable
     {
         protected CLogger __logger;
 
         protected readonly string __connection_string;
 
-        protected dbPack()
+        protected dbConnector()
         {
             __logger = new CLogger();
 
@@ -58,7 +36,7 @@ namespace Bithumb.API.lib.database
                         __conn.ConnectionString = __connection_string;
                         __conn.Open();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         __logger.WriteLog(e);
                     }
@@ -76,61 +54,47 @@ namespace Bithumb.API.lib.database
         }
     }
 
-    public class PublicTickerTbl : dbPack
+    public class PublicTickerEventArgs : EventArgs
     {
-        /*
-         * public event EventHandler OnPublicTickerTblChanged;
-         *  상기 형태로 미리 정의된 델리게이트 타잎 EventHandler 를 사용할 수 있음
-         *  EventHandler 는 아래와 같이 미리 정의 되어 있음
-         *  delegate void System.EventHandler(object sender, System.EventArgs e)
-         *  따라서, 외부 클래스에서 결과 값을 처리하려면 EventArgs 을 타잎 캐스팅해야 함
-         * 
-         *  반환 타잎 캐스팅을 하는 번거로움을 피하기 위해 커스텀 델리게이트 타잎을 사용함
-         * 
-         */
-        public event PublicTickerEventHandler OnPublicTickerTblChanged;
+        List<PublicTicker> __publicTickers;
 
-        /*
-         * event 키워드 사용에 대해서
-         *  event 키워드를 사용하면 클래스 외부에서 OnPublicTickerTblChanged 를 직접 호출할 수 없음
-         *  객체.OnPublicTickerTblChanged [+=|-=] PublicTickerEventHandler(콜백함수) 형태로만 접근 가능
-         * 
-         *  event 키워드가 생략되면 클래스 외부에서 일반 멤버함수처럼 OnPublicTickerTblChanged 를 직접 호출 가능함
-         */
+        public PublicTickerEventArgs(List<PublicTicker> publicTickers)
+        {
+            __publicTickers = publicTickers;
+        }
 
+
+        public List<PublicTicker> publicTickers
+        {
+            get
+            {
+                return __publicTickers;
+            }
+
+        }
+    }
+
+
+    public class PublicTickerBroker : dbConnector
+    {
+        public event EventHandler<PublicTickerEventArgs> OnPublicTickerTableChanged;
 
         private readonly string __table_name;
         private readonly CoinType __coin_type;
 
-        private const int __lookbackPeriod = 1;
+        private int __lookbackPeriod;
 
+        public int LookbackPeriod
+        {
+            get;
+            set;
+        }
 
-        public PublicTickerTbl(CoinType ct)
+        public PublicTickerBroker(CoinType ct)
         {
             __table_name = "PublicTicker" + ct.enumToString();
             __coin_type = ct;
-        }
-
-        public void SqlDependencyStart()
-        {
-            SqlDependencyStop();
-
-            try
-            {
-                SqlDependency.Start(__connection_string);
-
-                // 처음 한번은 DB 쿼리를 해야 이벤트가 동작을 시작한다
-                SelectOnChange();
-            }
-            catch (Exception e)
-            {
-                __logger.WriteLog(e);
-            }
-        }
-
-        public void SqlDependencyStop()
-        {
-            SqlDependency.Stop(__connection_string);
+            __lookbackPeriod = 1;
         }
 
         public void Insert(PublicTicker pt)
@@ -175,13 +139,11 @@ namespace Bithumb.API.lib.database
             {
                 __logger.WriteLog(e);
             }
-
-            //Disconnect();
         }
 
-        public void SelectOnChange()
+        public void OnChangeFromDB()
         {
-            List<PublicTicker> ptList = new List<PublicTicker>();
+            List<PublicTicker> publicTickers = new List<PublicTicker>();
 
             string sql = "SELECT [opening_price],[closing_price],[min_price],[max_price],[average_price],[units_traded],[volume_1day],[volume_7day],[buy_price],[sell_price],[ts]"
                  + " FROM dbo." + __table_name
@@ -204,7 +166,7 @@ namespace Bithumb.API.lib.database
                     else
                     {
                         // SQL Server 로 부터 이벤트가 발생하면 본 함수가 다시 호출될 수 있도록 델리게이트를 등록한다.
-                        SelectOnChange();
+                        OnChangeFromDB();
                     }
                 };
 
@@ -229,17 +191,39 @@ namespace Bithumb.API.lib.database
                     pt.data.sell_price = (decimal)row["sell_price"];
                     pt.data.date = Convert.ToInt64(row["ts"]);// (long)row["ts"];
 
-                    ptList.Add(pt);
+                    publicTickers.Add(pt);
                 }
             }
 
             //To make sure we only trigger the event if a handler is present
             //we check the event to make sure it's not null.
-            if (OnPublicTickerTblChanged != null)
+            if (OnPublicTickerTableChanged != null)
             { // callee 에서 함수가 지정된 경우에 지정된 함수를 실행한다 
                 // 매개변수로 수취한 정보를 전달한다.
-                OnPublicTickerTblChanged(this, new PublicTickerArgs(ptList));
+                OnPublicTickerTableChanged(this, new PublicTickerEventArgs(publicTickers));
             }
+        }
+
+        public void SqlDependencyStart()
+        {
+            SqlDependencyStop();
+
+            try
+            {
+                SqlDependency.Start(__connection_string);
+
+                // 처음 한번은 DB 쿼리를 해야 이벤트가 동작을 시작한다
+                OnChangeFromDB();
+            }
+            catch (Exception e)
+            {
+                __logger.WriteLog(e);
+            }
+        }
+
+        public void SqlDependencyStop()
+        {
+            SqlDependency.Stop(__connection_string);
         }
 
     }

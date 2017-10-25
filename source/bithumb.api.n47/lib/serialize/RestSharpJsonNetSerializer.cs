@@ -25,7 +25,7 @@ namespace Bithumb.LIB.Serialize
         /// <summary>
         /// Serialize the object as JSON
         /// </summary>
-        /// <param name="obj">Object to serialize
+        /// <param name="obj">Object to serialize</param>
         /// <returns>JSON as String</returns>
         public string Serialize(object obj)
         {

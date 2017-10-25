@@ -67,7 +67,6 @@
     <Compile Include="lib\types\■■■dealerType.cs" />
     <Compile Include="lib\types\■■■orderType.cs" />
     <Compile Include="lib\types\■■■orderTypeConverter.cs" />
-    <Compile Include="lib\■■■OWebClient.cs" />
     <Compile Include="lib\OWebRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="api\XApiClient.cs" />

@@ -6,6 +6,7 @@ namespace Bithumb.LIB.Configuration
 {
     /// <summary>
     /// 로그처리와 관련된 Server Library Class
+    /// "C:\\ProgramData\\logging\\201709\\Bithumb20170929.log"
     /// </summary>
     public class CLogger
     {
@@ -17,7 +18,7 @@ namespace Bithumb.LIB.Configuration
         /// <summary>
         /// 로그파일 이름의 Prefix 설정
         /// </summary>
-        public CLogger(string p_log_name = "BITHUMB")
+        public CLogger(string p_log_name = "Bithumb")
         {
             this.LogFileName = p_log_name;
         }
@@ -77,7 +78,7 @@ namespace Bithumb.LIB.Configuration
 
         /// <summary>
         /// 로그파일 풀 패스
-        /// "C:\\ProgramData\\logging\\201709\\BITHUMB20170929.log"
+        /// "C:\\ProgramData\\logging\\201709\\Bithumb20170929.log"
         /// </summary>
         /// <param name="p_message_type"></param>
         /// <param name="p_message"></param>
@@ -92,11 +93,11 @@ namespace Bithumb.LIB.Configuration
                 // YYYYMM 폴더 생성
                 var _log_directory = __cconfig.GetLoggingFolder(String.Format("{0:yyyyMM}", _log_time));
 
-                //_log_file = "BTC-TRADING20170929.log"
+                //_log_file = "Bithumb20170929.log"
                 var _log_file = String.Format("{0}{1:yyyyMMdd}.log", this.LogFileName, _log_time);
 
                 // _log_directory = "C:\\ProgramData\\logging\\201709"
-                // _log_path = "C:\\ProgramData\\logging\\201709\\BTC-TRADING20170929.log"
+                // _log_path = "C:\\ProgramData\\logging\\201709\\Bithumb20170929.log"
                 var _log_path = Path.Combine(_log_directory, _log_file);
 
                 _fs = new FileStream(_log_path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);

@@ -23,6 +23,7 @@ namespace Bithumb.LIB
         { 
             if (ServicePointManager.ServerCertificateValidationCallback == null)
                 ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
+                //ServicePointManager.ServerCertificateValidationCallback = delegate { return true; }
         }
 
         private static char[] __to_digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
@@ -66,7 +67,7 @@ namespace Bithumb.LIB
         }
 
         /// <summary>
-        /// 
+        /// Return IRestClient (Interface)
         /// </summary>
         /// <param name="baseurl"></param>
         /// <returns></returns>
@@ -84,7 +85,7 @@ namespace Bithumb.LIB
         }
 
         /// <summary>
-        /// 
+        /// Return IRestRequest (Interface)
         /// </summary>
         /// <param name="resource"></param>
         /// <param name="method"></param>

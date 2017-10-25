@@ -18,7 +18,7 @@ namespace bithumb.crawler
         {
             Timer t = new Timer(callback, null, 0, 1000*1);
 
-            Console.WriteLine("Bithumb Public Ticker Data Request Start. Press Any Key To Stop.");
+            Console.WriteLine("Bithumb Public Ticker Data Request Start. Press Any Key To Stop.\n\n\n");
             Console.ReadLine();
 
             t.Dispose();
@@ -33,12 +33,13 @@ namespace bithumb.crawler
         {
             DateTime currentTime = DateTime.Now;
 
-            if (currentTime.Minute == prevTime.Minute)
-                return; // 같은 분 안에서는 동작 안함
+            //if (currentTime.Minute == prevTime.Minute)
+            //    return; // 같은 분 안에서는 동작 안함
 
             prevTime = currentTime; // 분이 바뀌었음 
 
-            Console.WriteLine("{0} Crawler requests public ticker data", DateTime.Now);
+            // \r 스위치로 콘솔의 동일 행에 겹쳐쓰기
+            Console.Write("\rCrawler requests public ticker data at {0} ", DateTime.Now);
 
             foreach (CoinType ct in Enum.GetValues(typeof(CoinType)))
             {
@@ -55,23 +56,33 @@ namespace bithumb.crawler
         {
             var _public_api = new XPublicApi();
 
-            var _ticker = await _public_api.Ticker(ct.enumToString());
+            try
+            {
+                var _ticker = await _public_api.Ticker(ct.enumToString());
 
-            if (_ticker != null)
-            { // null return  이 오는 경우가 있다.
-                if( _ticker.status == 0 )
+                if (_ticker != null)
                 {
-                    // 정상 수신 시 DB Insert
-                    PublicTickerTbl ptt = new PublicTickerTbl(ct);
+                    if (_ticker.status == 0)
+                    {
+                        // 정상 수신 시 DB Insert
+                        PublicTickerBroker ptt = new PublicTickerBroker(ct);
 
-                    
-                    ptt.Insert(_ticker);
+
+                        ptt.Insert(_ticker);
+                    }
+                    else
+                    {
+                        Console.WriteLine("_ticker.status = {0}, _ticker.message = {1}", _ticker.status, _ticker.message);
+                    }
                 }
-                else
-                {
-                    Console.WriteLine("_ticker.status = {0}, _ticker.message = {1}", _ticker.status, _ticker.message);
-                }
+
             }
+            catch(Exception e)
+            {
+                new CLogger().WriteLog(e);
+            }
+
+
         }
     }
 }

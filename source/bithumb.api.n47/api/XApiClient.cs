@@ -11,12 +11,10 @@ using RestSharp;
 namespace Bithumb.API
 {
     /// <summary>
-    /// GitHub Test
+    /// XApiClient : OWebRequest, IDisposable
     /// </summary>
     public class XApiClient : OWebRequest, IDisposable
     {
-        private CLogger __logger;
-
         private const string __api_url = "https://api.bithumb.com";
 
         private string __connect_key;
@@ -25,17 +23,15 @@ namespace Bithumb.API
         /// <summary>
         /// 
         /// </summary>
-        public XApiClient(string connect_key, string secret_key)
-            : base()
+        public XApiClient(string connect_key, string secret_key) : base()
         {
-            __logger = new CLogger();
-
             __connect_key = connect_key;
             __secret_key = secret_key;
         }
 
         /// <summary>
-        /// 
+        /// 컨텐츠에 대한 보안 정보 생성하여 Header 설정
+        /// 비밀키 기반으로 HTTP 헤더에 서명을 추가하기 위한 작업이 핵심
         /// </summary>
         /// <param name="endpoint"></param>
         /// <param name="rgData"></param>
@@ -43,8 +39,7 @@ namespace Bithumb.API
         /// <param name="apiSecret"></param>
         /// <returns></returns>
         protected Dictionary<string, object> GetHttpHeaders(string endpoint, Dictionary<string, object> rgData, string apiKey, string apiSecret)
-        { // 컨텐츠에 대한 보안 정보 생성하여 Header 설정
-            // 결국 _secretKey 를 기반으로 HTTP 헤더에 _signature 를 추가하기 위한 작업이 핵심
+        { 
             var _nonce = UnixTime.NowMilli.ToString();
             var _data = EncodeURIComponent(rgData);
             var _message = String.Format("{0};{1};{2}", endpoint, _data, _nonce);
@@ -70,7 +65,7 @@ namespace Bithumb.API
         }
 
         /// <summary>
-        /// 
+        /// POST 방식 비동기 호출
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="endpoint"></param>
@@ -116,7 +111,7 @@ namespace Bithumb.API
                 }
                 catch (Exception e)
                 {
-                    __logger.WriteLog(e);
+                    new CLogger().WriteLog(e);
                 }
 
                 return await tcs.Task;
@@ -124,7 +119,7 @@ namespace Bithumb.API
         }
 
         /// <summary>
-        /// 
+        /// GET 방식 비동기 호출
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="endpoint"></param>
@@ -154,7 +149,7 @@ namespace Bithumb.API
                 }
                 catch (Exception e)
                 {
-                    __logger.WriteLog(e);
+                    new CLogger().WriteLog(e);
                 }
 
 
