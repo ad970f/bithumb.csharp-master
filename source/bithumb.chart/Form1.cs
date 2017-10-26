@@ -36,7 +36,7 @@ namespace bithumb.chart
 
             ptb.OnPublicTickerTableChanged += new EventHandler<PublicTickerEventArgs>(NewPublicTickerHandler);
 
-            ptb.SqlDependencyStart();
+            ptb.SqlDependencyStart(1);
         }
 
 
@@ -56,55 +56,38 @@ namespace bithumb.chart
 
         void UpdateChart(PublicTickerEventArgs e)
         {
-            decimal highestMax = decimal.MinValue;
-            decimal lowestMin = decimal.MaxValue;
-
-            for ( int i=0; i < e.publicTickers.Count; i++)
-            {
-                if (e.publicTickers[i].data.max_price > highestMax)
-                    highestMax = e.publicTickers[i].data.max_price;
-
-                if (e.publicTickers[i].data.min_price < lowestMin)
-                    lowestMin = e.publicTickers[i].data.min_price;
-            }
-
             siseChart.Series["closing_price"].Points.Clear();
             siseChart.Series["max_price"].Points.Clear();
             siseChart.Series["min_price"].Points.Clear();
             siseChart.Series["average_price"].Points.Clear();
 
-            siseChart.ChartAreas[0].AxisY.Maximum = (double)highestMax * 1.01;
-            siseChart.ChartAreas[0].AxisY.Minimum = (double)lowestMin * 0.99;
+            siseChart.ChartAreas[0].AxisY.Maximum = (double)e.max_prices.Max() * 1.01;
+            siseChart.ChartAreas[0].AxisY.Minimum = (double)e.min_prices.Min() * 0.99;
 
-            for (int i = 0; i < e.publicTickers.Count - 1; i++)
+            for (int i = 0; i < e.Count - 1; i++)
             {
-                siseChart.Series["closing_price"].Points.AddY(e.publicTickers[i].data.closing_price);
-                siseChart.Series["max_price"].Points.AddY(e.publicTickers[i].data.max_price);
-                siseChart.Series["min_price"].Points.AddY(e.publicTickers[i].data.min_price);
-                siseChart.Series["average_price"].Points.AddY(e.publicTickers[i].data.average_price);
+                siseChart.Series["closing_price"].Points.AddY(e.closing_prices[i]);
+                siseChart.Series["max_price"].Points.AddY(e.max_prices[i]);
+                siseChart.Series["min_price"].Points.AddY(e.min_prices[i]);
+                siseChart.Series["average_price"].Points.AddY(e.average_prices[i]);
             }
 
-            label1.Text = "24H Range% = " +
-                ((e.publicTickers[e.publicTickers.Count - 1].data.max_price
-                - e.publicTickers[e.publicTickers.Count - 1].data.min_price)
-                / e.publicTickers[e.publicTickers.Count - 1].data.closing_price).ToString("P2")
+            decimal dayVolatility = e.closing_prices[e.Count - 1] == 0 ? 0 : 
+                (e.max_prices[e.Count - 1] - e.min_prices[e.Count - 1]) / e.closing_prices[e.Count - 1];
 
-                + ", Current = " + 
-                e.publicTickers[e.publicTickers.Count - 1].data.closing_price.ToString("#,#")
+            decimal stochastics = e.max_prices[e.Count - 1] == e.min_prices[e.Count - 1] ? 0 :
+                (e.closing_prices[e.Count - 1] - e.min_prices[e.Count - 1]) / (e.max_prices[e.Count - 1] - e.min_prices[e.Count - 1]);
 
-                + ", Stochastic = " +
 
-               ((e.publicTickers[e.publicTickers.Count - 1].data.closing_price
-                - e.publicTickers[e.publicTickers.Count - 1].data.min_price)
-               / (e.publicTickers[e.publicTickers.Count - 1].data.max_price
-                - e.publicTickers[e.publicTickers.Count - 1].data.min_price)).ToString("P2")
-            ;
+            label1.Text = "24 Hour Range% = " + dayVolatility.ToString("P2")
+                + ", Current = " + e.closing_prices[e.Count - 1].ToString("#,#")
+                + ", Stochastic = " + stochastics.ToString("P2");
 
-            textBox1.AppendText(UnixTime.ToLocalTimeMilliString(e.publicTickers[e.publicTickers.Count - 1].data.date) + "   "
-                + e.publicTickers[e.publicTickers.Count - 1].data.closing_price.ToString("#,###.####") + "   "
-                + e.publicTickers[e.publicTickers.Count - 1].data.max_price.ToString("#,###.####") + "   "
-                + e.publicTickers[e.publicTickers.Count - 1].data.min_price.ToString("#,###.####") + "   "
-                + e.publicTickers[e.publicTickers.Count - 1].data.average_price.ToString("#,###.###0") + "   "
+            textBox1.AppendText(UnixTime.ToLocalTimeMilliString(e.time_stamps[e.Count - 1]) + "   "
+                + e.closing_prices[e.Count - 1].ToString("#,###.####") + "   "
+                + e.max_prices[e.Count - 1].ToString("#,###.####") + "   "
+                + e.min_prices[e.Count - 1].ToString("#,###.####") + "   "
+                + e.average_prices[e.Count - 1].ToString("#,###.###0") + "   "
                 + "\n");
 
         }

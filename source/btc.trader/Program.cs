@@ -25,11 +25,17 @@ namespace btc.trader
 
             ptb.OnPublicTickerTableChanged += new EventHandler<PublicTickerEventArgs>(Strategy);
 
-            ptb.SqlDependencyStart();
+            ptb.SqlDependencyStart(1);
 
             Console.ReadLine();
         }
 
+        /// <summary>
+        /// 티커 테이블에 시계열 데이터 한 행이 추가될 때 마다 전략 코드를 실행한다.
+        /// 예스 트레이더 혹은 스팟의 스크립트가 호출되는 구조와 같다.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         static void Strategy(object source, PublicTickerEventArgs e)
         {
             Console.Write("\rStrategy Called at {0} ", DateTime.Now);

@@ -10,16 +10,15 @@ using Bithumb.LIB.Types;
 
 namespace Bithumb.API.lib.database
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class dbConnector : IDisposable
     {
-        protected CLogger __logger;
-
         protected readonly string __connection_string;
 
         protected dbConnector()
         {
-            __logger = new CLogger();
-
             __connection_string = "Data Source=.;Initial Catalog=Bithumb;Integrated Security=True";
         }
 
@@ -38,7 +37,7 @@ namespace Bithumb.API.lib.database
                     }
                     catch (Exception e)
                     {
-                        __logger.WriteLog(e);
+                        new CLogger().WriteLog(e);
                     }
 
                 }
@@ -54,27 +53,52 @@ namespace Bithumb.API.lib.database
         }
     }
 
+    /// <summary>
+    /// Caller 이벤트핸들러에게 전달할 매개변수
+    /// </summary>
     public class PublicTickerEventArgs : EventArgs
     {
-        List<PublicTicker> __publicTickers;
+        public List<decimal> opening_prices = new List<decimal>();
+        public List<decimal> closing_prices = new List<decimal>();
+        public List<decimal> min_prices = new List<decimal>();
+        public List<decimal> max_prices = new List<decimal>();
+        public List<decimal> average_prices = new List<decimal>();
+        public List<decimal> units_tradeds = new List<decimal>();
+        public List<decimal> volume_1days = new List<decimal>();
+        public List<decimal> volume_7days = new List<decimal>();
+        public List<decimal> buy_prices = new List<decimal>();
+        public List<decimal> sell_prices = new List<decimal>();
+        public List<Int64> time_stamps = new List<Int64>();
+
+        public int Count { get; }
 
         public PublicTickerEventArgs(List<PublicTicker> publicTickers)
         {
-            __publicTickers = publicTickers;
-        }
 
+            Count = publicTickers.Count;
 
-        public List<PublicTicker> publicTickers
-        {
-            get
+            foreach (PublicTicker pt in publicTickers)
             {
-                return __publicTickers;
+                opening_prices.Add(pt.data.opening_price);
+                closing_prices.Add(pt.data.closing_price);
+                min_prices.Add(pt.data.min_price);
+                max_prices.Add(pt.data.max_price);
+                average_prices.Add(pt.data.average_price);
+                units_tradeds.Add(pt.data.units_traded);
+                volume_1days.Add(pt.data.volume_1day);
+                volume_7days.Add(pt.data.volume_7day);
+                buy_prices.Add(pt.data.buy_price);
+                sell_prices.Add(pt.data.sell_price);
+                time_stamps.Add(pt.data.date);
             }
 
         }
+
     }
 
-
+    /// <summary>
+    /// PublicTicker 테이블의 CRUD 를 위한 타잎
+    /// </summary>
     public class PublicTickerBroker : dbConnector
     {
         public event EventHandler<PublicTickerEventArgs> OnPublicTickerTableChanged;
@@ -82,21 +106,20 @@ namespace Bithumb.API.lib.database
         private readonly string __table_name;
         private readonly CoinType __coin_type;
 
-        private int __lookbackPeriod;
-
-        public int LookbackPeriod
-        {
-            get;
-            set;
-        }
+        // 단위 : Hours
+        private int __lookbackHours;
 
         public PublicTickerBroker(CoinType ct)
         {
             __table_name = "PublicTicker" + ct.enumToString();
             __coin_type = ct;
-            __lookbackPeriod = 1;
+ 
         }
 
+        /// <summary>
+        /// Crawler 가 빗썸 사이트에 Request 한 시세 정보를 DB 에 저장
+        /// </summary>
+        /// <param name="pt"></param>
         public void Insert(PublicTicker pt)
         {
             string insertQuery = string.Format("INSERT INTO {0} ", __table_name);
@@ -137,17 +160,20 @@ namespace Bithumb.API.lib.database
             }
             catch (Exception e)
             {
-                __logger.WriteLog(e);
+                new CLogger().WriteLog(e);
             }
         }
 
+        /// <summary>
+        /// 시세 테이블에 신규 데이터 발생 시 Select 한 행집합을 매개변수로 Caller 이벤트핸들러 호출
+        /// </summary>
         public void OnChangeFromDB()
         {
             List<PublicTicker> publicTickers = new List<PublicTicker>();
 
             string sql = "SELECT [opening_price],[closing_price],[min_price],[max_price],[average_price],[units_traded],[volume_1day],[volume_7day],[buy_price],[sell_price],[ts]"
                  + " FROM dbo." + __table_name
-                 + " WHERE ts > " + (long)(DateTime.UtcNow.AddDays(-1*__lookbackPeriod) - new DateTime(1970, 1, 1)).TotalMilliseconds
+                 + " WHERE ts > " + (long)(DateTime.UtcNow.AddHours(-1*__lookbackHours) - new DateTime(1970, 1, 1)).TotalMilliseconds
                  + " ORDER BY ts ASC";
 
             using (SqlCommand cmd = new SqlCommand(sql, Connection))
@@ -161,7 +187,7 @@ namespace Bithumb.API.lib.database
                 {
                     if (e.Info == SqlNotificationInfo.Invalid)
                     {
-                        __logger.WriteLog(e.ToString());
+                        new CLogger().WriteLog(e.ToString());
                     }
                     else
                     {
@@ -204,8 +230,14 @@ namespace Bithumb.API.lib.database
             }
         }
 
-        public void SqlDependencyStart()
+        /// <summary>
+        //
+        /// </summary>
+        /// <param name="lookbackHours">Default: 1 Hour</param>
+        public void SqlDependencyStart(int lookbackHours = 1)
         {
+            __lookbackHours = lookbackHours;
+
             SqlDependencyStop();
 
             try
@@ -217,7 +249,7 @@ namespace Bithumb.API.lib.database
             }
             catch (Exception e)
             {
-                __logger.WriteLog(e);
+                new CLogger().WriteLog(e);
             }
         }
 
